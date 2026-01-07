@@ -1,42 +1,26 @@
 const button = document.getElementById("loadNews");
 const newsList = document.getElementById("newsList");
-const loading = document.getElementById("loading");
 
 const API_KEY = "21ba3e56-7691-4c53-9af3-1118eda985d6";
 
 button.addEventListener("click", () => {
-  loading.style.display = "block";
-
-  fetch(`https://content.guardianapis.com/search?order-by=newest&page-size=5&show-fields=trailText&api-key=${API_KEY}`)
+  fetch(`https://content.guardianapis.com/search?api-key=${API_KEY}&show-fields=trailText&order-by=newest&page-size=5`)
     .then(response => response.json())
     .then(data => {
-      newsList.innerHTML = "";
+      newsList.innerHTML = ""; // ล้างข้อมูลเก่า
 
       data.response.results.forEach(news => {
         const li = document.createElement("li");
-
-        const date = new Date(news.webPublicationDate).toLocaleDateString("th-TH", {
-          day: "numeric",
-          month: "long",
-          year: "numeric"
-        });
-
         li.innerHTML = `
-          <strong>${news.webTitle}</strong>
+          <h3>${news.webTitle}</h3>
           <p>${news.fields?.trailText || "ไม่มีคำอธิบาย"}</p>
-          <div class="news-meta">
-            📰 ${news.sectionName} | 📅 ${date}
-          </div>
+          <small>เผยแพร่: ${new Date(news.webPublicationDate).toLocaleString()}</small>
+          <hr>
         `;
-
         newsList.appendChild(li);
       });
     })
     .catch(error => {
       console.error("เกิดข้อผิดพลาด:", error);
-      newsList.innerHTML = "<li>ไม่สามารถโหลดข่าวได้</li>";
-    })
-    .finally(() => {
-      loading.style.display = "none";
     });
 });
